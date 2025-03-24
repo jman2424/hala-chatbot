@@ -67,34 +67,13 @@ def whatsapp_status_callback():
 
     return "Status received", 200
 
-import os
-from flask import Flask
-
-app = Flask(__name__)
-
-@app.route("/")
-def home():
-    return "Hello, Render!"
-
-if __name__ == "__main__":
-    # Render sets PORT dynamically, so we must use it
-    port = int(os.environ.get("PORT", 10000))  # Default to 10000 if PORT not set
-    app.run(host="0.0.0.0", port=port, debug=True)
-
-
-
-import os
-from flask import Flask
-
-app = Flask(__name__)
 
 @app.route("/")
 def home():
     return "Hello, World!"
 
-# Make sure to bind to the port set in the environment variable
+
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 5000))  # Default to 5000 if not set
+    # Make sure to bind to the port set in the environment variable
+    port = int(os.environ.get("PORT", 10000))  # Default to 5000 if not set
     app.run(host="0.0.0.0", port=port, debug=True)
-
-
