@@ -54,7 +54,9 @@ def whatsapp_webhook():
 
     except Exception as e:
         print(f"Error generating AI response: {e}")
-        return "Error generating AI response", 500  # In case AI fails to generate a response
+        return f"Error generating AI response: {e}", 500  # Return the exception in the response for easier debugging
+
+
 
 
 @app.route("/whatsapp/status", methods=["POST"])
