@@ -79,4 +79,4 @@ def home():
 if __name__ == "__main__":
     # ✅ Fix: Use dynamic PORT for Render
     port = int(os.environ.get("PORT", 10000))  
-    app.run(host="0.0.0.0", port=port, debug=True)
+    app.run(host="0.0.0.0", port=port, debug=True, use_reloader=False)
