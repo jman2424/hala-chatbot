@@ -6,10 +6,14 @@ import os
 
 app = Flask(__name__)
 
-# Load the custom Halal Chatbot model
-llm = OllamaLLM(model="halal-chatbot")
+# ✅ Load the Halal Chatbot model
+try:
+    llm = OllamaLLM(model="halal-chatbot")
+    print("✅ Halal Chatbot model loaded successfully.")
+except Exception as e:
+    print(f"❌ ERROR: Failed to load model: {e}")
 
-# Define prompt template
+# ✅ Define chatbot prompt template
 prompt = PromptTemplate(
     input_variables=["input"],
     template=""" 
@@ -23,41 +27,41 @@ Chatbot:
 """
 )
 
-# ✅ Correct way to chain prompt and LLM
+# ✅ Connect prompt with Langchain model
 chatbot = prompt | llm
 
 @app.route("/whatsapp", methods=["POST"])
 def whatsapp_webhook():
     """Handles incoming WhatsApp messages from Twilio."""
     
-    # Debugging: Print the incoming request data
-    print(f"Request Data: {request.values}")
-    
-    incoming_msg = request.values.get("Body", "").strip()
-
-    if not incoming_msg:
-        print("No message received.")
-        return "No message received", 400  # In case no message is received
-
-    print(f"Received message: {incoming_msg}")  # Debugging line to check incoming message
-
     try:
-        # Generate AI response using 'invoke' method for Langchain chain
-        ai_response = chatbot.invoke({"input": incoming_msg})
-        print(f"AI response: {ai_response}")  # Debugging line to check AI response
+        print(f"🔹 Incoming Request Data: {request.values}")  # Debugging
         
-        # ✅ These lines must be inside the try block!
-        print(f"Sending message to WhatsApp: {ai_response}")
+        # ✅ Get the incoming message from WhatsApp
+        incoming_msg = request.values.get("Body", "").strip()
+        
+        if not incoming_msg:
+            print("⚠️ No message received.")
+            return "No message received", 400  # Bad request
+        
+        print(f"✅ Received Message: {incoming_msg}")
+
+        # ✅ Generate AI response
+        print("🟡 Generating AI response...")
+        ai_response = chatbot.invoke({"input": incoming_msg})
+        
+        print(f"✅ AI Response: {ai_response}")  # Log AI response
+        
+        # ✅ Create Twilio response
         response = MessagingResponse()
         response.message(ai_response)
+        
+        print("✅ Sending response back to WhatsApp")
         return str(response)
 
     except Exception as e:
-        print(f"Error generating AI response: {e}")
-        return f"Error generating AI response: {e}", 500  # Return the exception in the response for easier debugging
-
-
-
+        print(f"❌ ERROR: {e}")  # Log errors
+        return f"Internal Server Error: {e}", 500  # Return error message
 
 @app.route("/whatsapp/status", methods=["POST"])
 def whatsapp_status_callback():
@@ -65,17 +69,14 @@ def whatsapp_status_callback():
     status = request.values.get("MessageStatus", "")
     message_sid = request.values.get("MessageSid", "")
 
-    print(f"Message SID: {message_sid}, Status: {status}")
-
+    print(f"🔹 Message SID: {message_sid}, Status: {status}")
     return "Status received", 200
-
 
 @app.route("/")
 def home():
-    return "Hello, World!"
-
+    return "✅ Hello, Render! Your chatbot is running."
 
 if __name__ == "__main__":
-    # Make sure to bind to the port set in the environment variable
-    port = int(os.environ.get("PORT", 10000))  # Default to 5000 if not set
+    # ✅ Fix: Use dynamic PORT for Render
+    port = int(os.environ.get("PORT", 10000))  
     app.run(host="0.0.0.0", port=port, debug=True)
