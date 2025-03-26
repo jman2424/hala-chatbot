@@ -9,7 +9,7 @@ app = Flask(__name__)
 
 # ✅ Load the Halal Chatbot model
 try:
-    llm = OllamaLLM(model="halal-chatbot")
+    llm = OllamaLLM(model="halal-chatbot", base_url="http://0.0.0.0:11434")
     print("✅ Halal Chatbot model loaded successfully.")
 except Exception as e:
     print(f"❌ ERROR: Failed to load model: {e}")
