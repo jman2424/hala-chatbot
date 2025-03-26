@@ -3,6 +3,7 @@ from twilio.twiml.messaging_response import MessagingResponse
 from langchain_ollama import OllamaLLM
 from langchain.prompts import PromptTemplate
 import os
+import traceback
 
 app = Flask(__name__)
 
@@ -32,36 +33,31 @@ chatbot = prompt | llm
 
 @app.route("/whatsapp", methods=["POST"])
 def whatsapp_webhook():
-    """Handles incoming WhatsApp messages from Twilio."""
-    
     try:
-        print(f"🔹 Incoming Request Data: {request.values}")  # Debugging
-        
-        # ✅ Get the incoming message from WhatsApp
-        incoming_msg = request.values.get("Body", "").strip()
-        
-        if not incoming_msg:
-            print("⚠️ No message received.")
-            return "No message received", 400  # Bad request
-        
-        print(f"✅ Received Message: {incoming_msg}")
+        print(f"Request Data: {request.values}")  # Debugging
 
-        # ✅ Generate AI response
-        print("🟡 Generating AI response...")
+        incoming_msg = request.values.get("Body", "").strip()
+
+        if not incoming_msg:
+            print("No message received.")
+            return "No message received", 400
+
+        print(f"Received message: {incoming_msg}")  # Debugging
+
+        # Generate AI response
         ai_response = chatbot.invoke({"input": incoming_msg})
-        
-        print(f"✅ AI Response: {ai_response}")  # Log AI response
-        
-        # ✅ Create Twilio response
+        print(f"AI response: {ai_response}")  # Debugging
+
         response = MessagingResponse()
         response.message(ai_response)
-        
-        print("✅ Sending response back to WhatsApp")
         return str(response)
 
     except Exception as e:
-        print(f"❌ ERROR: {e}")  # Log errors
-        return f"Internal Server Error: {e}", 500  # Return error message
+        print("Error in /whatsapp route:")
+        traceback.print_exc()  # Print full error traceback
+        return "Error generating AI response", 500
+
+    
 
 @app.route("/whatsapp/status", methods=["POST"])
 def whatsapp_status_callback():
