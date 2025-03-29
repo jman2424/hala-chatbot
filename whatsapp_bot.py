@@ -9,7 +9,7 @@ app = Flask(__name__)
 
 # ✅ Load the Halal Chatbot model
 try:
-  llm = OllamaLLM(model="halal-chatbot", base_url="https://4c92-2a02-6b67-d904-ef00-f0eb-8.ngrok.io")
+  llm = OllamaLLM(model="halal-chatbot", base_url=" https://b575-2a02-6b67-d904-ef00-adfc-681f-e059-6cbf.n "
   print("✅ Halal Chatbot model loaded successfully.")
 except Exception as e:
     print(f"❌ ERROR: Failed to load model: {e}")
