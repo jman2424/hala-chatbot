@@ -9,8 +9,8 @@ app = Flask(__name__)
 
 # ✅ Load the Halal Chatbot model
 try:
-  llm = OllamaLLM(model="halal-chatbot", base_url="  https://b044-2a02-6b67-d904-ef00-adfc-681f-e059-6cbf.n"                            
-  print("✅ Halal Chatbot model loaded successfully.")
+   llm = OllamaLLM(model="halal-chatbot", base_url=" https://c8d1-2a02-6b67-d904-ef00-dd27-8515-444a-f471.ngrok-free.app")
+   print("✅ Halal Chatbot model loaded successfully.")
 except Exception as e:
     print(f"❌ ERROR: Failed to load model: {e}")
 
@@ -33,31 +33,36 @@ chatbot = prompt | llm
 
 @app.route("/whatsapp", methods=["POST"])
 def whatsapp_webhook():
+    """Handles incoming WhatsApp messages from Twilio."""
+    
     try:
-        print(f"Request Data: {request.values}")  # Debugging
-
+        print(f"🔹 Incoming Request Data: {request.values}")  # Debugging
+        
+        # ✅ Get the incoming message from WhatsApp
         incoming_msg = request.values.get("Body", "").strip()
-
+        
         if not incoming_msg:
-            print("No message received.")
-            return "No message received", 400
+            print("⚠️ No message received.")
+            return "No message received", 400  # Bad request
+        
+        print(f"✅ Received Message: {incoming_msg}")
 
-        print(f"Received message: {incoming_msg}")  # Debugging
-
-        # Generate AI response
+        # ✅ Generate AI response
+        print("🟡 Generating AI response...")
         ai_response = chatbot.invoke({"input": incoming_msg})
-        print(f"AI response: {ai_response}")  # Debugging
-
+        
+        print(f"✅ AI Response: {ai_response}")  # Log AI response
+        
+        # ✅ Create Twilio response
         response = MessagingResponse()
         response.message(ai_response)
+        
+        print("✅ Sending response back to WhatsApp")
         return str(response)
 
     except Exception as e:
-        print("Error in /whatsapp route:")
-        traceback.print_exc()  # Print full error traceback
-        return "Error generating AI response", 500
-
-    
+        print(f"❌ ERROR: {e}")  # Log errors
+        return f"Internal Server Error: {e}", 500  # Return error message
 
 @app.route("/whatsapp/status", methods=["POST"])
 def whatsapp_status_callback():
